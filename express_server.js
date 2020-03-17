@@ -28,4 +28,22 @@ app.get('/hello', (req, res) => {
 app.get('/urls', (req, res) => {
   let templateVars = { urls: urlDatabase };
   res.render('urls_index', templateVars);
+  console.log(templateVars);
+});
+
+app.get('/urls/:shortURL', (req, res) => {
+  // we can get the shortURL from the req.params
+  // we have to find a way to get the longURL
+  // shortURL + urlDatabase -> longURL
+
+  // user is looking at a list of their short urls
+  // they can click on one of them to see more details
+  // that redirects them to a new url -> /urls/:shortURL
+
+  console.log(req.params);
+  const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL];
+
+  let templateVars = { shortURL: shortURL, longURL: longURL };
+  res.render('urls_show', templateVars);
 });
