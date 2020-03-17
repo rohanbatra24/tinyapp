@@ -41,14 +41,6 @@ app.get('/urls', (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  // we can get the shortURL from the req.params
-  // we have to find a way to get the longURL
-  // shortURL + urlDatabase -> longURL
-
-  // user is looking at a list of their short urls
-  // they can click on one of them to see more details
-  // that redirects them to a new url -> /urls/:shortURL
-
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
 
@@ -67,6 +59,12 @@ app.get('/u/:shortUrl', (req, res) => {
   const shortURL = req.params.shortUrl;
   let longURL = urlDatabase[shortURL];
   res.redirect(longURL);
+});
+
+app.post('/urls/:shortURL/delete', (req, res) => {
+  const shortURL = req.params.shortURL;
+  delete urlDatabase[shortURL];
+  res.redirect(`/urls/`);
 });
 
 app.listen(PORT, () => {
