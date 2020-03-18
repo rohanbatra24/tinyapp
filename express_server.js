@@ -71,7 +71,6 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 app.post('/urls/:shortURL/', (req, res) => {
   const shortUrl = req.params.shortURL;
-  console.log(req.params);
   const longURL = req.body.newLongUrl;
   urlDatabase[shortUrl] = longURL;
   res.redirect(`/urls/`);
@@ -87,6 +86,10 @@ app.post('/login/', (req, res) => {
 app.post('/logout/', (req, res) => {
   res.clearCookie('username');
   res.redirect(`/urls/`);
+});
+
+app.get('/register', (req, res) => {
+  res.render('login_form', { username: req.cookies['username'] });
 });
 
 app.listen(PORT, () => {
