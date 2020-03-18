@@ -55,6 +55,7 @@ app.get('/hello', (req, res) => {
 app.get('/urls', (req, res) => {
   const user = users[req.cookies.user_id];
   let templateVars = { urls: urlDatabase, user: user };
+  console.log(users);
   res.render('urls_index', templateVars);
 });
 
@@ -93,9 +94,15 @@ app.post('/urls/:shortURL/', (req, res) => {
 });
 
 app.post('/login/', (req, res) => {
-  const username = req.body.username;
-  res.cookie('username', username);
-  res.redirect(`/urls/`);
+  for (let user in users) {
+    if (req.body.email === users[user].email && req.body.password === users[user].password) {
+      res.cookie('user_id', users[user].id);
+      console.log(users);
+      res.redirect(`/urls/`);
+      return;
+    }
+  }
+  res.status(403).send('Wrong Email or password');
 });
 
 app.get('/login/', (req, res) => {
