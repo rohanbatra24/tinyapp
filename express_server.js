@@ -98,6 +98,14 @@ app.post('/login/', (req, res) => {
   res.redirect(`/urls/`);
 });
 
+app.get('/login/', (req, res) => {
+  const user = users[req.cookies.user_id];
+  let templateVars = { user: user };
+  const username = req.body.username;
+  res.cookie('username', username);
+  res.render(`login_form`, templateVars);
+});
+
 app.post('/logout/', (req, res) => {
   res.clearCookie('user_id');
   res.redirect(`/urls/`);
@@ -105,7 +113,7 @@ app.post('/logout/', (req, res) => {
 
 app.get('/register', (req, res) => {
   const user = users[req.cookies.user_id];
-  res.render('login_form', { user: user });
+  res.render('registration_form', { user: user });
 });
 
 app.post('/register', (req, res) => {
@@ -114,7 +122,6 @@ app.post('/register', (req, res) => {
   }
 
   for (let user in users) {
-    console.log(user.email);
     if (users[user].email === req.body.email) {
       res.send('Email already exists');
     }

@@ -16,10 +16,8 @@
         <button type=submit>Logout</button>
       </form>
     <% } else{ %>  
-      <form action="/login" method="POST">
-        <input type="text" placeholder="username" name="username"></input>
-        <button type=submit>Login</button>
-      </form>
+        <button><a href='/login'type=submit>Login</a></button>
+        <button><a href='/register' type=submit>Register</a></button>
    <% } %>
     
     </form>
