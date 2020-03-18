@@ -54,8 +54,6 @@ app.get('/hello', (req, res) => {
 
 app.get('/urls', (req, res) => {
   const user = users[req.cookies.user_id];
-  console.log('user---', user);
-  // console.log(req.cookies);
   let templateVars = { urls: urlDatabase, user: user };
   res.render('urls_index', templateVars);
 });
@@ -96,7 +94,6 @@ app.post('/urls/:shortURL/', (req, res) => {
 
 app.post('/login/', (req, res) => {
   const username = req.body.username;
-  // console.log(req.cookies);
   res.cookie('username', username);
   res.redirect(`/urls/`);
 });
@@ -112,7 +109,17 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  console.log(req.body);
+  if (req.body.email === '' || req.body.password === '') {
+    res.status(404).send('Email or password blank');
+  }
+
+  for (let user in users) {
+    console.log(user.email);
+    if (users[user].email === req.body.email) {
+      res.send('Email already exists');
+    }
+  }
+
   const id = generateRandomString();
   users[id] = {
     id: id,
@@ -120,7 +127,6 @@ app.post('/register', (req, res) => {
     password: req.body.password
   };
   res.cookie('user_id', id);
-  console.log(users);
   res.redirect('/urls');
 });
 
