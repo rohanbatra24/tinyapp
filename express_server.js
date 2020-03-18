@@ -108,8 +108,6 @@ app.post('/login/', (req, res) => {
 app.get('/login/', (req, res) => {
   const user = users[req.cookies.user_id];
   let templateVars = { user: user };
-  const username = req.body.username;
-  res.cookie('username', username);
   res.render(`login_form`, templateVars);
 });
 
