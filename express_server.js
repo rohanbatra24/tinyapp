@@ -5,6 +5,19 @@ const generateRandomString = function() {
   return result;
 };
 
+const users = {
+  userRandomID: {
+    id: 'userRandomID',
+    email: 'user@example.com',
+    password: 'purple-monkey-dinosaur'
+  },
+  user2RandomID: {
+    id: 'user2RandomID',
+    email: 'user2@example.com',
+    password: 'dishwasher-funk'
+  }
+};
+
 const express = require('express');
 const app = express();
 const cookieParser = require('cookie-parser');
@@ -90,6 +103,18 @@ app.post('/logout/', (req, res) => {
 
 app.get('/register', (req, res) => {
   res.render('login_form', { username: req.cookies['username'] });
+});
+
+app.post('/register', (req, res) => {
+  console.log(req.body);
+  const id = generateRandomString();
+  users[id] = {
+    id: id,
+    email: req.body.email,
+    password: req.body.password
+  };
+  console.log(users);
+  res.redirect('/urls');
 });
 
 app.listen(PORT, () => {
