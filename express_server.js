@@ -1,3 +1,11 @@
+const urlsForUser = (id) => {
+  for (let url in urlDatabase) {
+    if (urlDatabase[url].userId === req.cookies.user_id) {
+      console.log(urlDatabase[url].longURL);
+    }
+  }
+};
+
 const generateRandomString = function() {
   let result = '';
   let randomChars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -59,16 +67,15 @@ app.get('/hello', (req, res) => {
 app.get('/urls', (req, res) => {
   const user = users[req.cookies.user_id];
   let templateVars = { urls: urlDatabase, user: user };
-  console.log('DB', urlDatabase);
-  console.log('USERS', users);
   res.render('urls_index', templateVars);
 });
 
 app.get('/urls/:shortURL', (req, res) => {
   const user = users[req.cookies.user_id];
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
-  let templateVars = { shortURL: shortURL, longURL: longURL, user: user };
+  console.log(shortURL);
+  const longURL = urlDatabase[shortURL].longURL;
+  let templateVars = { shortURL: shortURL, longURL: longURL, user: user, urls: urlDatabase };
   res.render('urls_show', templateVars);
 });
 
@@ -150,8 +157,6 @@ app.post('/register', (req, res) => {
   res.cookie('user_id', id);
   res.redirect('/urls');
 });
-
-console.log(1);
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
