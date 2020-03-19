@@ -52,18 +52,6 @@ const urlsForUser = function(id) {
   return filteredUrls;
 };
 
-// urlsForUser();
-
-app.get('/urls/new', (req, res) => {
-  const user = users[req.session.user_id];
-  if (user) {
-    let templateVars = { user: user };
-    res.render('urls_new', templateVars);
-  } else {
-    res.redirect('/login');
-  }
-});
-
 // app.get('/', (req, res) => {
 //   res.send('Hello!');
 // });
@@ -76,6 +64,16 @@ app.get('/urls/new', (req, res) => {
 //   res.send('<html><body>Hello <b>World</b></body></html>\n');
 // });
 
+app.get('/urls/new', (req, res) => {
+  const user = users[req.session.user_id];
+  if (user) {
+    let templateVars = { user: user };
+    res.render('urls_new', templateVars);
+  } else {
+    res.redirect('/login');
+  }
+});
+
 app.get('/urls', (req, res) => {
   const user = users[req.session.user_id];
   const userUrls = urlsForUser(req.session.user_id);
@@ -86,7 +84,6 @@ app.get('/urls', (req, res) => {
 app.get('/urls/:shortURL', (req, res) => {
   const user = users[req.session.user_id];
   const shortURL = req.params.shortURL;
-  console.log(shortURL);
   const longURL = urlDatabase[shortURL].longURL;
   let templateVars = { shortURL: shortURL, longURL: longURL, user: user, urls: urlDatabase };
   res.render('urls_show', templateVars);
@@ -95,7 +92,6 @@ app.get('/urls/:shortURL', (req, res) => {
 app.post('/urls', (req, res) => {
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
-
   for (let user in users) {
     if (user === req.session.user_id) {
       urlDatabase[shortURL] = { longURL: `http://${longURL}`, userID: user };
@@ -130,8 +126,6 @@ app.post('/urls/:shortURL/', (req, res) => {
 });
 
 app.post('/login/', (req, res) => {
-  // console.log(bcrypt.compareSync(req.body.password, uusers[user].password));
-
   for (let user in users) {
     if (req.body.email === users[user].email && bcrypt.compareSync(req.body.password, users[user].password)) {
       req.session.user_id = users[user].id;
@@ -162,16 +156,12 @@ app.post('/register', (req, res) => {
   if (req.body.email === '' || req.body.password === '') {
     res.status(404).send('Email or password blank');
   }
-
   for (let user in users) {
     if (users[user].email === req.body.email) {
       res.send('Email already exists');
     }
   }
-
   const id = generateRandomString();
-
-  console.log(req.body.password);
   bcrypt.hash(req.body.password, 10, (err, hash) => {
     users[id] = {
       id: id,
