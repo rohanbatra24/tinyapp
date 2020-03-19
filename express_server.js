@@ -56,24 +56,21 @@ app.get('/urls/new', (req, res) => {
   }
 });
 
-app.get('/', (req, res) => {
-  res.send('Hello!');
-});
+// app.get('/', (req, res) => {
+//   res.send('Hello!');
+// });
 
-app.get('/urls.json', (req, res) => {
-  res.json(urlDatabase);
-});
+// app.get('/urls.json', (req, res) => {
+//   res.json(urlDatabase);
+// });
 
-app.get('/hello', (req, res) => {
-  res.send('<html><body>Hello <b>World</b></body></html>\n');
-});
+// app.get('/hello', (req, res) => {
+//   res.send('<html><body>Hello <b>World</b></body></html>\n');
+// });
 
 app.get('/urls', (req, res) => {
   const user = users[req.cookies.user_id];
   const userUrls = urlsForUser(req.cookies.user_id);
-  // console.log(userUrls);
-  // console.log(users, user);
-  // console.log(urlDatabase);
   let templateVars = { urls: userUrls, user: user };
   res.render('urls_index', templateVars);
 });
@@ -107,14 +104,18 @@ app.get('/u/:shortUrl', (req, res) => {
 
 app.post('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
-  delete urlDatabase[shortURL];
-  res.redirect(`/urls/`);
+  if (urlDatabase[shortURL].userID === req.cookies.user_id) {
+    delete urlDatabase[shortURL];
+    res.redirect(`/urls/`);
+  } else {
+    res.redirect(`/login/`);
+  }
 });
 
 app.post('/urls/:shortURL/', (req, res) => {
   const shortUrl = req.params.shortURL;
   const longURL = req.body.newLongUrl;
-  urlDatabase[shortUrl] = longURL;
+  urlDatabase[shortUrl].longURL = longURL;
   res.redirect(`/urls/`);
 });
 
