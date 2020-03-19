@@ -114,9 +114,11 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 app.post('/urls/:shortURL/', (req, res) => {
   const shortUrl = req.params.shortURL;
-  const longURL = req.body.newLongUrl;
-  urlDatabase[shortUrl].longURL = longURL;
-  res.redirect(`/urls/`);
+  if (urlDatabase[shortUrl].userID === req.cookies.user_id) {
+    const longURL = req.body.newLongUrl;
+    urlDatabase[shortUrl].longURL = longURL;
+    res.redirect(`/urls/`);
+  } else res.redirect('/login/');
 });
 
 app.post('/login/', (req, res) => {
