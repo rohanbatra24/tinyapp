@@ -1,11 +1,3 @@
-const urlsForUser = (id) => {
-  for (let url in urlDatabase) {
-    if (urlDatabase[url].userId === req.cookies.user_id) {
-      console.log(urlDatabase[url].longURL);
-    }
-  }
-};
-
 const generateRandomString = function() {
   let result = '';
   let randomChars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -42,6 +34,18 @@ const urlDatabase = {
   dd: { longURL: 'http://ddd', userID: 'Rwfaw34vd' }
 };
 
+const urlsForUser = function(id) {
+  const filteredUrls = {};
+  for (let url in urlDatabase) {
+    if (urlDatabase[url].userID === id) {
+      filteredUrls[url] = urlDatabase[url];
+    }
+  }
+  return filteredUrls;
+};
+
+// urlsForUser();
+
 app.get('/urls/new', (req, res) => {
   const user = users[req.cookies.user_id];
   if (user) {
@@ -66,7 +70,11 @@ app.get('/hello', (req, res) => {
 
 app.get('/urls', (req, res) => {
   const user = users[req.cookies.user_id];
-  let templateVars = { urls: urlDatabase, user: user };
+  const userUrls = urlsForUser(req.cookies.user_id);
+  // console.log(userUrls);
+  // console.log(users, user);
+  // console.log(urlDatabase);
+  let templateVars = { urls: userUrls, user: user };
   res.render('urls_index', templateVars);
 });
 
@@ -93,7 +101,7 @@ app.post('/urls', (req, res) => {
 
 app.get('/u/:shortUrl', (req, res) => {
   const shortURL = req.params.shortUrl;
-  let longURL = urlDatabase[shortURL];
+  let longURL = urlDatabase[shortURL].longURL;
   res.redirect(longURL);
 });
 
