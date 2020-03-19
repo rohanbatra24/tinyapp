@@ -30,14 +30,18 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const urlDatabase = {
-  b2xVn2: 'http://www.lighthouselabs.ca',
-  '9sm5xK': 'http://www.google.com'
+  cc: { longURL: 'http://ccc', userID: 'Rw6gvd' },
+  dd: { longURL: 'http://ddd', userID: 'Rwfaw34vd' }
 };
 
 app.get('/urls/new', (req, res) => {
   const user = users[req.cookies.user_id];
-  let templateVars = { user: user };
-  res.render('urls_new', templateVars);
+  if (user) {
+    let templateVars = { user: user };
+    res.render('urls_new', templateVars);
+  } else {
+    res.redirect('/login');
+  }
 });
 
 app.get('/', (req, res) => {
@@ -55,7 +59,8 @@ app.get('/hello', (req, res) => {
 app.get('/urls', (req, res) => {
   const user = users[req.cookies.user_id];
   let templateVars = { urls: urlDatabase, user: user };
-  console.log(users);
+  console.log('DB', urlDatabase);
+  console.log('USERS', users);
   res.render('urls_index', templateVars);
 });
 
@@ -70,7 +75,12 @@ app.get('/urls/:shortURL', (req, res) => {
 app.post('/urls', (req, res) => {
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = `http://${longURL}`;
+
+  for (let user in users) {
+    if (user === req.cookies.user_id) {
+      urlDatabase[shortURL] = { longURL: `http://${longURL}`, userID: user };
+    }
+  }
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -97,7 +107,6 @@ app.post('/login/', (req, res) => {
   for (let user in users) {
     if (req.body.email === users[user].email && req.body.password === users[user].password) {
       res.cookie('user_id', users[user].id);
-      console.log(users);
       res.redirect(`/urls/`);
       return;
     }
@@ -141,6 +150,8 @@ app.post('/register', (req, res) => {
   res.cookie('user_id', id);
   res.redirect('/urls');
 });
+
+console.log(1);
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
