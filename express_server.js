@@ -62,11 +62,6 @@ const urlsForUser = function(id) {
   return filteredUrls;
 };
 
-//ONLY for testing to see the current urlDatabase in the session
-app.get('/test', (req, res) => {
-  res.send(urlDatabase);
-});
-
 // GET /
 app.get('/', (req, res) => {
   // check if user is logged in
