@@ -33,8 +33,14 @@ const users = {
 
 // Url database Object
 const urlDatabase = {
-  cc: { longURL: 'http://ccc', userID: 'Rw6gvd' },
-  dd: { longURL: 'http://ddd', userID: 'Rwfaw34vd' }
+  // cc: {
+  //   longUrl: 'http://ccc',
+  //   userID: 'Rw6gvd'
+  // },
+  // dd: {
+  //   longUrl: 'http://ddd',
+  //   userID: 'Rwfaw34vd'
+  // }
 };
 
 //Function to generate random 6 character string for IDs
@@ -55,6 +61,11 @@ const urlsForUser = function(id) {
   }
   return filteredUrls;
 };
+
+//ONLY for testing to see the current urlDatabase in the session
+app.get('/test', (req, res) => {
+  res.send(urlDatabase);
+});
 
 // GET /
 app.get('/', (req, res) => {
@@ -87,11 +98,11 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
-// GET /urls/:shortURL
-app.get('/urls/:shortURL', (req, res) => {
-  const shortURL = req.params.shortURL;
+// GET /urls/:shortUrl
+app.get('/urls/:shortUrl', (req, res) => {
+  const shortUrl = req.params.shortUrl;
   // check if short url exists in url database
-  if (!urlDatabase[shortURL]) {
+  if (!urlDatabase[shortUrl]) {
     res.send('Short url does not exist.');
     return;
   }
@@ -99,8 +110,13 @@ app.get('/urls/:shortURL', (req, res) => {
   for (let user in users) {
     if (user === req.session.user_id) {
       const user = users[req.session.user_id];
-      const longURL = urlDatabase[shortURL].longURL;
-      let templateVars = { shortURL: shortURL, longURL: longURL, user: user, urls: urlDatabase };
+      const longUrl = urlDatabase[shortUrl].longUrl;
+      let templateVars = {
+        shortUrl: shortUrl,
+        longUrl: longUrl,
+        user: user,
+        urls: urlDatabase
+      };
       res.render('urls_show', templateVars);
       return;
     }
@@ -110,44 +126,48 @@ app.get('/urls/:shortURL', (req, res) => {
 
 //POST /urls
 app.post('/urls', (req, res) => {
-  const longURL = req.body.longURL;
-  const shortURL = generateRandomString();
-  // if user is logged in, add object to url database with short url as key and longUrl and user id nested
+  const longUrl = req.body.longUrl;
+  const shortUrl = generateRandomString();
+  // if user is logged in, add object to url database with short url as key and longUrl
+  //  and user id nested
   for (let user in users) {
     if (user === req.session.user_id) {
-      urlDatabase[shortURL] = { longURL: `http://${longURL}`, userID: user };
+      urlDatabase[shortUrl] = {
+        longUrl: `http://${longUrl}`,
+        userID: user
+      };
     }
   }
-  res.redirect(`/urls/${shortURL}`);
+  res.redirect(`/urls/${shortUrl}`);
 });
 
 // GET /u/:shortUrl
 app.get('/u/:shortUrl', (req, res) => {
   // redirect to corresponding long URL
-  const shortURL = req.params.shortUrl;
-  let longURL = urlDatabase[shortURL].longURL;
-  res.redirect(longURL);
+  const shortUrl = req.params.shortUrl;
+  let longUrl = `${urlDatabase[shortUrl].longUrl}`;
+  res.redirect(longUrl);
 });
 
-//POST /urls/:shortURL/delete
-app.post('/urls/:shortURL/delete', (req, res) => {
-  const shortURL = req.params.shortURL;
+//POST /urls/:shortUrl/delete
+app.post('/urls/:shortUrl/delete', (req, res) => {
+  const shortUrl = req.params.shortUrl;
   // if user owns url, delete it from database
-  if (urlDatabase[shortURL].userID === req.session.user_id) {
-    delete urlDatabase[shortURL];
+  if (urlDatabase[shortUrl].userID === req.session.user_id) {
+    delete urlDatabase[shortUrl];
     res.redirect(`/urls/`);
   } else {
     res.redirect(`/login/`);
   }
 });
 
-// POST /urls/:shortURL/
-app.post('/urls/:shortURL/', (req, res) => {
-  const shortUrl = req.params.shortURL;
+// POST /urls/:shortUrl/
+app.post('/urls/:shortUrl/', (req, res) => {
+  const shortUrl = req.params.shortUrl;
   // Update the long URL with new long url
   if (urlDatabase[shortUrl].userID === req.session.user_id) {
-    const longURL = req.body.newLongUrl;
-    urlDatabase[shortUrl].longURL = longURL;
+    const longUrl = `http://${req.body.newLongUrl}`;
+    urlDatabase[shortUrl].longUrl = longUrl;
     res.redirect(`/urls/`);
   } else res.redirect('/login/');
 });
@@ -201,12 +221,14 @@ app.post('/register', (req, res) => {
   // if email or password entered is blank, return error
   if (req.body.email === '' || req.body.password === '') {
     res.status(404).send('Email or password blank');
+    return;
   }
 
   // if email already exists, send message
   for (let user in users) {
     if (users[user].email === req.body.email) {
       res.send('Email already exists');
+      return;
     }
   }
 
